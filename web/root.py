@@ -1,10 +1,7 @@
 import os
 import sys
 import json
-import urllib
-import requests
 import cherrypy
-import traceback
 
 
 CWD = os.path.dirname(__file__)
@@ -14,6 +11,7 @@ if not path in sys.path:
     sys.path.insert(1, path)
 del path
 
+from lib import suggest
 from lib import params
 from lib import templates
 
@@ -29,9 +27,9 @@ class Root:
   def suggest(self, *args, **kwargs):
     query = kwargs.get('query')
     callback = kwargs.get('callback', None)
-    response = self.suggest_freebase(query)
+    response = suggest.freebase(query)
     if not response:
-      response = self.suggest_dbpedia(query)
+      response = suggest.dbpedia(query)
     if response:
       response = {'result': response}
       if callback:
@@ -42,59 +40,6 @@ class Root:
       if callback:
         return callback + '('+ json.dumps(response) + ')'
       return json.dumps(response)
-
-
-  def suggest_freebase(self, query):
-    url = params.FREEBASE_SUGGEST_URL + urllib.quote(query)
-    try:
-      response = requests.get(url)
-      results = json.loads(response.text)
-      if results['status'] == '200 OK':
-        results = results['result']
-        resp = []
-        results = sorted(results, key=lambda k: k['score'], reverse=True)
-        results = results[:4]
-        for r in results:
-          try:
-            #if r['name'].lower() == query.lower():
-              resp.append({
-                  'name': r['name'],
-                  'tag': r['notable']['name'],
-                  'score': r['score']
-               })
-          except:
-            continue
-        # Remove duplicate dicts
-        resp = [dict(t) for t in set([tuple(d.items()) for d in resp])]
-        resp = sorted(resp, key=lambda k: k['score'], reverse=True)
-        return resp
-    except Exception as e:
-      print traceback.format_exc()
-    return None
-
-
-  def suggest_dbpedia(self, query):
-    url = params.DBPEDIA_SUGGEST_URL + urllib.quote(query)
-    try:
-      header = {'accept': 'application/json'}
-      response = requests.get(url, headers=header)
-      results = json.loads(response.text)['results']
-      resp = []
-      for r in results:
-        try:
-          if r['label'].lower() == query.lower():
-            resp.append({
-                'name': r['label'],
-                'tag': r['classes'][0]['label'].capitalize(),
-                'score': 0
-             })
-        except:
-          continue
-      resp = [dict(t) for t in set([tuple(d.items()) for d in resp])]
-      return resp
-    except Exception as e:
-      print traceback.format_exc()
-      return None
 
 
 if __name__ == '__main__':
