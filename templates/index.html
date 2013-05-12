@@ -24,49 +24,9 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/bootstrap.min.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-
-
+    <script src="/js/suggest.js"></script>
     <script>
-    $("#searchText").focus();
-    $(function() {
-      $( "#searchText" ).autocomplete({
-        source: function( request, response ) {
-          $.ajax({
-            url: "http://localhost:8080/suggest",
-            dataType: "jsonp",
-            data: {
-              query: request.term
-            },
-            success: function( data ) {
-              response( $.map( data.result, function( item ) {
-                return {
-                  label: item.name,
-                  value: item.name,
-                  desc: item.tag
-                }
-              }));
-            }
-          });
-        },
-        minLength: 2,
-        /* select: function( event, ui ) { */
-        /*   log( ui.item ? */
-        /*     "Selected: " + ui.item.label : */
-        /*     "Nothing selected, input was " + this.value); */
-        /* }, */
-        open: function() {
-          $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-        },
-        close: function() {
-          $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
-        }
-      })
-      .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-        return $( "<li>" )
-          .append( "<a>" + item.label + "<span style=\"float:right;color:#888\">" + item.desc + "</a>" )
-          .appendTo( ul );
-      };
-    });
+      $("#searchText").focus();
     </script>
   </body>
 </html>
