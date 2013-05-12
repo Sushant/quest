@@ -3,40 +3,18 @@
   <head>
     <title>Quest</title>
     <!-- Bootstrap -->
+    <link rel="icon" type="image/png" href="/images/favicon.ico">
     <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet"></link>
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-      .btn-large {
-        min-width: 220px;
-      }
-      .centering{
-        float:none;
-        margin:0 auto
-      }
-    </style>
+    <link href="/css/quest.css" rel="stylesheet"></link>
   </head>
   <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          </a>
-          <a class="brand" href="#">Quest: Knowledge Search</a>
-          <div class="nav-collapse collapse">
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-
     <div class="container">
-      <div class="hero-unit">
-        <form class="form-search" method="post" action="/search">
-          <div class="input-append" style="margin-left:100px;">
-            <input type="text" class="input-xxlarge search-query" id="searchText" name="searchTerm">
-            <button type="submit" class="btn btn-inverse"><i class="icon-search icon-white"></i></button>
+      <div align="center">
+        <img src="/images/quest.png" alt="" height="321px" width="667px">
+        <form method="post" action="/search">
+          <div class="input-append spacer">
+            <input type="text" class="input-xxlarge" id="searchText" name="searchTerm">
+            <button type="submit" class="btn"><i class="icon-search"></i></button>
             <div class="ui-widget" style="margin-top: 2em; font-family: Arial;">
           </div>
         </form>
@@ -49,6 +27,7 @@
 
 
     <script>
+    $("#searchText").focus();
     $(function() {
       $( "#searchText" ).autocomplete({
         source: function( request, response ) {
@@ -84,7 +63,7 @@
       })
       .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
         return $( "<li>" )
-          .append( "<a>" + item.label + "<span style=\"float:right;\">" + item.desc + "</a>" )
+          .append( "<a>" + item.label + "<span style=\"float:right;color:#888\">" + item.desc + "</a>" )
           .appendTo( ul );
       };
     });

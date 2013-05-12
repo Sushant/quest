@@ -1,0 +1,14 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+.centering{
+    float:none;
+    margin:0 auto
+}
+
+
+.spacer {
+    margin-top: 20px; /* define margin as you see fit */
+}
