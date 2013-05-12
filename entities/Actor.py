@@ -1,14 +1,23 @@
 from Entity import Entity
 import wolframalpha
 import imdb
+import json
+import urllib
 
 class Actor(Entity):
 	""" Entity representation for Entity called Actor. """
-	def get_results(self,query):
-		result = self.get_facts(query);
-		print result;
-		#self.get_list_of_movies(query);
 
+	## Overriding the get_results method of base class.
+	def get_results(self,query):
+		results = {};
+		results['Facts'] = self.get_facts(query);
+		#results['Movies'] = self.get_list_of_movies(query);
+		results['Movies'] = self.get_list_of_movies_from_freebase(query);
+		results['Similar Actors'] = self.get_list_of_similar_people(query);
+		results['Characters Portrayed'] = self.get_list_of_characters_portrayed(query);
+		print results;
+
+	## API call to wolfram alpha to get facts.
 	def get_facts(self,query):
 		client = wolframalpha.Client(Entity.wolframalpha_key);
 		res = client.query(query);
@@ -29,10 +38,63 @@ class Actor(Entity):
 					result_dictionary[str(s.title)] = str(s.text);
 		return result_dictionary;
 
-	def get_list_of_movies(self,query):
+	## API call to IMDB for list of movies. Very slow.
+	def get_list_of_movies_from_IMDB(self,query):
 		ia = imdb.IMDb();
 		person = ia.search_person(query);
 		required_person = ia.get_person(person[0].personID);
 		titles = required_person.get_titlesRefs();
+		movie_dictionary = {};
 		for title in titles:
-			print title;
+			movie_dictionary[str(title)] = "To be encoded!!!!";
+		return movie_dictionary;
+
+	## API call to freebase for list of movies. Response is quicker than IMDB API.
+	def get_list_of_movies_from_freebase(self,query):
+		service_url = 'https://www.googleapis.com/freebase/v1/search';
+		params = {
+  			'query': query,
+  			'filter': '(all type:/film/film)',
+  			'limit': 30,
+  			'key': Entity.freebase_key
+				}
+		url = service_url + '?' + urllib.urlencode(params);
+		response = json.loads(urllib.urlopen(url).read());
+		movie_dictionary = {};
+		for result in response['result']:
+			movie = str(result['name']);
+  			movie_dictionary[movie] = "URL To Be Encoded!!!!!";
+  		return movie_dictionary;
+
+  	## API call to freebase to get list of similar people.
+  	def get_list_of_similar_people(self,query):
+  		service_url = 'https://www.googleapis.com/freebase/v1/search';
+		params = {
+  			'query': query,
+  			'filter': '(all type:/people/person practitioner_of:actor)',
+  			'limit': 10,
+  			'key': Entity.freebase_key
+				}
+		url = service_url + '?' + urllib.urlencode(params);
+		response = json.loads(urllib.urlopen(url).read());
+		people_dictionary = {};
+		for result in response['result']:
+			person = str(result['name']);
+			people_dictionary[person] = "URL To Be Encoded!!!!!";
+  		return people_dictionary;
+
+  	## Generating list of characters portrayed.
+  	def get_list_of_characters_portrayed(self,query):
+  		service_url = 'https://www.googleapis.com/freebase/v1/search';
+		params = {
+  			'filter': '(all portrayed_by:\"'+query+'\")',
+  			'limit': 15,
+  			'key': Entity.freebase_key
+				}
+		url = service_url + '?' + urllib.urlencode(params);
+		response = json.loads(urllib.urlopen(url).read());
+		character_dictionary = {};
+		for result in response['result']:
+			character = str(result['name']);
+			character_dictionary[character] = "URL To Be Encoded!!!!!";
+  		return character_dictionary;
