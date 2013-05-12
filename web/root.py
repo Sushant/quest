@@ -28,13 +28,20 @@ class Root:
   @cherrypy.expose
   def suggest(self, *args, **kwargs):
     query = kwargs.get('query')
+    callback = kwargs.get('callback', None)
     response = self.suggest_freebase(query)
     if not response:
       response = self.suggest_dbpedia(query)
     if response:
+      response = {'result': response}
+      if callback:
+        return callback + '('+ json.dumps(response) + ')'
       return json.dumps(response)
     else:
-      return json.dumps([])
+      response = {'result': []}
+      if callback:
+        return callback + '('+ json.dumps(response) + ')'
+      return json.dumps(response)
 
 
   def suggest_freebase(self, query):

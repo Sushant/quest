@@ -35,14 +35,60 @@
       <div class="hero-unit">
         <form class="form-search" method="post" action="/search">
           <div class="input-append" style="margin-left:100px;">
-            <input type="text" class="input-xxlarge search-query" name="searchTerm">
+            <input type="text" class="input-xxlarge search-query" id="searchText" name="searchTerm">
             <button type="submit" class="btn btn-inverse"><i class="icon-search icon-white"></i></button>
+            <div class="ui-widget" style="margin-top: 2em; font-family: Arial;">
           </div>
         </form>
     </div>
 
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+
+    <script>
+    $(function() {
+      $( "#searchText" ).autocomplete({
+        source: function( request, response ) {
+          $.ajax({
+            url: "http://localhost:8080/suggest",
+            dataType: "jsonp",
+            data: {
+              query: request.term
+            },
+            success: function( data ) {
+              response( $.map( data.result, function( item ) {
+                return {
+                  label: item.name,
+                  value: item.name,
+                  desc: item.tag
+                }
+              }));
+            }
+          });
+        },
+        minLength: 2,
+        /* select: function( event, ui ) { */
+        /*   log( ui.item ? */
+        /*     "Selected: " + ui.item.label : */
+        /*     "Nothing selected, input was " + this.value); */
+        /* }, */
+        open: function() {
+          $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+        },
+        close: function() {
+          $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+        }
+      })
+      .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+        return $( "<li>" )
+          .append( "<a>" + item.label + "<span style=\"float:right;\">" + item.desc + "</a>" )
+          .appendTo( ul );
+      };
+    });
+    </script>
   </body>
 </html>
 
