@@ -10,12 +10,13 @@ class Actor(Entity):
 	## Overriding the get_results method of base class.
 	def get_results(self,query):
 		results = {};
+		print query
 		results['Facts'] = self.get_facts(query);
 		#results['Movies'] = self.get_list_of_movies(query);
 		results['Movies'] = self.get_list_of_movies_from_freebase(query);
 		results['Similar Actors'] = self.get_list_of_similar_people(query);
 		results['Characters Portrayed'] = self.get_list_of_characters_portrayed(query);
-		print results;
+		return results;
 
 	## API call to wolfram alpha to get facts.
 	def get_facts(self,query):

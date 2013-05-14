@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import urllib
 import cherrypy
 
 
@@ -16,6 +17,26 @@ from lib import params
 from lib import templates
 
 class Root:
+
+  def __init__(self):
+    self.load_entities()
+
+
+  def load_entities(self):
+    sys.path.insert(1, params.ENTITIES_DIR)
+    #library_list = []
+    #print 'Loading entities...'
+
+    #for f in os.listdir(params.ENTITIES_DIR):
+    #  module_name, ext = os.path.splitext(f) # Handles no-extension files, etc.
+    #  print module_name, ext
+    #  if ext == '.py': # Important, ignore .pyc/other files.
+    #    if module_name != '__init__':
+    #      print 'imported module: %s' % (module_name)
+    #      module = __import__(module_name)
+    #      library_list.append(module)
+
+    #return library_list
 
   @cherrypy.expose
   def index(self):
@@ -40,6 +61,24 @@ class Root:
       if callback:
         return callback + '('+ json.dumps(response) + ')'
       return json.dumps(response)
+
+
+  @cherrypy.expose
+  def search(self, *args, **kwargs):
+    query = kwargs.get('query', None)
+    tag = kwargs.get('tag', None)
+    try:
+      module = __import__(tag.capitalize())
+      _class = getattr(module, tag.capitalize())
+      entity = _class()
+      results = entity.get_results(query)
+      results['query'] = query
+      results['tag'] = tag
+      template = templates.get('results.html')
+      return template.render(results)
+    except Exception as e:
+      print 'Error: ', e
+      return None
 
 
 if __name__ == '__main__':

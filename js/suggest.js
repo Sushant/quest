@@ -19,11 +19,14 @@
           });
         },
         minLength: 2,
-        /* select: function( event, ui ) { */
-        /*   log( ui.item ? */
-        /*     "Selected: " + ui.item.label : */
-        /*     "Nothing selected, input was " + this.value); */
-        /* }, */
+        select: function( event, ui ) {
+          console.log('Selected');
+          console.log(ui.item);
+          if (ui.item) {
+            $("#query").val(ui.item.label);
+            $("#tag").val(ui.item.desc);
+          }
+         },
         open: function() {
           $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
         },
