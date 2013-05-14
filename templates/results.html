@@ -6,6 +6,7 @@
     <link rel="icon" type="image/png" href="/images/favicon.ico">
     <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet"></link>
     <link href="/css/quest.css" rel="stylesheet"></link>
+    <link href="/css/jquery.bxslider.css" rel="stylesheet" />
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -13,7 +14,7 @@
         <div class="container">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
           </a>
-          <a class="brand" href="#">Quest</a>
+          <a class="brand" href="/">Quest</a>
           
           <div class="nav-collapse collapse">
             
@@ -36,31 +37,49 @@
 
     <div class="container-fluid">
       <div class="row-fluid">
-        <div class="span7 well">
-          <div class="row-fluid">
+        <div class="span7">
+          <h4>Movies</h4>
+          <div class="slider" style="text-align:center;">
+            {% for k, v in results['Movies'].iteritems() %}
+            <div class="slide" style="border-right:1px solid #ccc;">
+              <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;height:65px;width:45px;vertical-align:middle;"/>
+              <a href="#">{{ k }}</a>
+            </div>
+            {% endfor %}
           </div>
+          <h4>Similar Actors</h4>
+          <div class="slider" style="text-align:center;">
+            {% for k, v in results['Similar Actors'].iteritems() %}
+            <div class="slide" style="border-right:1px solid #ccc;">
+              <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;height:65px;width:45px;vertical-align:middle;"/>
+              <a href="#">{{ k }}</a>
+            </div>
+            {% endfor %}
+          </div>
+          
         </div>
 
         <!-- Info box -->
         <div class="span5">
-          <div class="well sidebar-nav">
+          <div class="sidebar-nav" style="border:1px solid #ccc;box-shadow: 0 0 5px #ccc;padding:10px;">
             <div class="row-fluid">
               <div class="span3">
-                <img src="http://www.wolframcdn.com/waimage/hset028/d83/d837501c86161ada220e93cc7ee84d71_v001s.jpg?z=1&w=105&h=150" class="img-rounded">
+                <img src="http://www.wolframcdn.com/waimage/hset028/d83/d837501c86161ada220e93cc7ee84d71_v001s.jpg?z=1&w=105&h=150" class="img-polaroid">
               </div>
               <div class="span9">
                 <dt>{{ query }}</dt>
                 <dl>
-                  {% for k,v in Facts['Basic information'].iteritems() %}
+                  {% for k,v in results['Facts']['Basic information'].iteritems() %}
                   <dt>{{ k }}</dt>
                   <dd>{{ v }}</dd>
                   {% endfor %}
                 </dl>
               </div>
             </div>
+            <hr />
             <div class="row-fluid">
               <ul>
-                {% for fact in Facts['Notable facts']%}
+                {% for fact in results['Facts']['Notable facts']%}
                   {% if fact %}
                 <li>{{ fact }}</li>
                    {% endif %}
@@ -79,6 +98,18 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="/js/suggest.js"></script>
+    <script src="/js/jquery.bxslider.min.js"></script>
+    <script>
+      $(document).ready(function(){
+        var slider = $('.slider').bxSlider({
+          slideWidth: 170,
+          minSlides: 2,
+          maxSlides: 5,
+          controls: false,
+          slideMargin: 10
+        });
+      });
+    </script>
   </body>
 </html>
 

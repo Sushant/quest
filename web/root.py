@@ -75,7 +75,7 @@ class Root:
       results['query'] = query
       results['tag'] = tag
       template = templates.get('results.html')
-      return template.render(results)
+      return template.render({'results': results})
     except Exception as e:
       print 'Error: ', e
       return None
