@@ -38,48 +38,62 @@
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span7">
-          {% for list in results['lists'] %}
-          <h4>{{ list['title'] }}</h4>
-          <div class="slider" style="text-align:center;">
-            {% for item in list['items'] %}
-            <div class="slide" style="border-right:1px solid #ccc;">
-              <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;height:65px;width:45px;vertical-align:middle;"/>
-              <a href="{{ item['url'] }}">{{ item['title'] }}</a>
+          {% if 'lists' in results and results['lists'] %}
+            {% for list in results['lists'] %}
+            <h4>{{ list['title'] }}</h4>
+            <div class="slider" style="text-align:center;">
+              {% for item in list['items'] %}
+              <div class="slide" style="border-right:1px solid #ccc;">
+                <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;height:65px;width:45px;vertical-align:middle;"/>
+                <a href="{{ item['url'] }}">{{ item['title'] }}</a>
+              </div>
+              {% endfor %}
             </div>
             {% endfor %}
-          </div>
-          {% endfor %}
+          {% endif %}
         </div>
 
         <!-- Info box -->
+        {% if 'infobox' in results %}
         <div class="span5">
           <div class="sidebar-nav" style="border:1px solid #ccc;box-shadow: 0 0 5px #ccc;padding:10px;">
             <div class="row-fluid">
               <div class="span3">
-                <img src="http://www.wolframcdn.com/waimage/hset028/d83/d837501c86161ada220e93cc7ee84d71_v001s.jpg?z=1&w=105&h=150" class="img-polaroid">
+                {% if 'image' in results['infobox'] %}
+                <img src="{{ results['infobox']['image'] }}" class="img-polaroid">
+                {% else %}
+                <img src="/images/blank_image.jpg" class="img-polaroid">
+                {% endif %}
               </div>
               <div class="span9">
+                {% if 'title' in results['infobox'] %}
                 <dt>{{ results['infobox']['title'] }}</dt>
+                {% endif %}
+                {% if 'basic_info' in results['infobox'] and results['infobox']['basic_info'] %}
                 <dl>
                   {% for k,v in results['infobox']['basic_info'].iteritems() %}
                   <dt>{{ k }}</dt>
                   <dd>{{ v }}</dd>
                   {% endfor %}
                 </dl>
+                {% endif %}
               </div>
             </div>
+            {% if 'summary' in results['infobox'] and results['infobox']['summary'] %}
             <hr />
             <div class="row-fluid">
               <ul>
-                {% for line in results['infobox']['summary']%}
+                {% for line in results['infobox']['summary'] %}
                   {% if line %}
                 <li>{{ line }}</li>
                    {% endif %}
                 {% endfor %}
               </ul>
             </div>
+            {% endif %}
           </div>
         </div>
+        {% endif %}
         <!-- End info box -->
 
       </div>
