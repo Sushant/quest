@@ -9,93 +9,149 @@ class Actor(Entity):
 
   ## Overriding the get_results method of base class.
   def get_results(self,query):
-    results = {};
-    print query
-    results['Facts'] = self.get_facts(query);
-    #results['Movies'] = self.get_list_of_movies(query);
-    results['Movies'] = self.get_list_of_movies_from_freebase(query);
-    results['Similar Actors'] = self.get_list_of_similar_people(query);
-    results['Characters Portrayed'] = self.get_list_of_characters_portrayed(query);
-    return results;
+    results = {}
 
-  ## API call to wolfram alpha to get facts.
+    infobox = self.get_facts(query)
+    if infobox:
+      results['infobox'] = infobox
+    results['lists'] = []
+    movies = self.get_list_of_movies_from_freebase(query)
+    if movies:
+      results['lists'].append(movies)
+
+    actors = self.get_list_of_similar_people(query)
+    if actors:
+      results['lists'].append(actors)
+
+    return results
+    #results['Similar Actors'] = self.get_list_of_similar_people(query)
+    #results['Characters Portrayed'] = self.get_list_of_characters_portrayed(query)
+    #return results
+
+
+  # Return format:
+  #'infobox': {
+  #       'title': String,
+  #       'image': String (url),
+  #       'basic_info': [
+  #            { 'dob': 'String',
+  #               'full name': 'String'}
+  #       ],
+  #       'summary': ['List of Strings']
+  #  }
   def get_facts(self,query):
-    client = wolframalpha.Client(Entity.wolframalpha_key);
-    res = client.query(query);
-    result_dictionary = {};
-    for s in res:
-      if str(s.title) != 'None' and str(s.text) != 'None':
-        if str(s.title).lower() == "basic information": 
-          temp_data = str(s.text).split('\n');
-          temp_dict = {};
-          for line in temp_data:
-            temp_index = line.split('|');
-            temp_dict[temp_index[0]] = temp_index[1];
-          result_dictionary[s.title] = temp_dict;
-        elif str(s.title).lower() == "notable facts":
-          temp_data = str(s.text).replace("...","").split('\n');
-          result_dictionary[s.title] = temp_data;
-        else:
-          result_dictionary[str(s.title)] = str(s.text);
-    return result_dictionary;
+    client = wolframalpha.Client(Entity.wolframalpha_key)
+    infobox = {}
+    try:
+      res = client.query(query)
+    except Exception as e:
+      print 'Failed to get facts from Wolfram|Alpha', str(e)
+      return infobox
+
+    for r in res:
+      try:
+        if r.title and r.text:
+          if r.title.lower() == 'Input interpretation'.lower():
+            infobox['title'] = r.text
+          elif r.title.lower() == 'Basic information'.lower():
+            lines = r.text.split('\n')
+            basic_info = {}
+            for line in lines:
+              pair = line.split(' | ')
+              basic_info[pair[0]] = pair[1]
+            infobox['basic_info'] = basic_info
+          elif r.title.lower() == 'Notable facts'.lower():
+            lines = r.text.split('\n')
+            summary = []
+            for line in lines:
+              if line != '...':
+                summary.append(line)
+            infobox['summary'] = summary
+      except Exception as e:
+        continue
+    return infobox
+
 
   ## API call to IMDB for list of movies. Very slow.
   def get_list_of_movies_from_IMDB(self,query):
-    ia = imdb.IMDb();
-    person = ia.search_person(query);
-    required_person = ia.get_person(person[0].personID);
-    titles = required_person.get_titlesRefs();
-    movie_dictionary = {};
+    ia = imdb.IMDb()
+    person = ia.search_person(query)
+    required_person = ia.get_person(person[0].personID)
+    titles = required_person.get_titlesRefs()
+    movie_dictionary = {}
     for title in titles:
-      movie_dictionary[str(title)] = "To be encoded!!!!";
-    return movie_dictionary;
+      movie_dictionary[str(title)] = "To be encoded!!!!"
+    return movie_dictionary
+
 
   ## API call to freebase for list of movies. Response is quicker than IMDB API.
-  def get_list_of_movies_from_freebase(self,query):
-    service_url = 'https://www.googleapis.com/freebase/v1/search';
+  def get_list_of_movies_from_freebase(self, query):
+    movies = {'title': 'Movies'}
+    service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
         'filter': '(all type:/film/film)',
         'limit': 30,
         'key': Entity.freebase_key
         }
-    url = service_url + '?' + urllib.urlencode(params);
-    response = json.loads(urllib.urlopen(url).read());
-    movie_dictionary = {};
+    try:
+      url = service_url + '?' + urllib.urlencode(params)
+      response = json.loads(urllib.urlopen(url).read())
+    except Exception as e:
+      return None
+
+    movie_items = []
     for result in response['result']:
-      movie = str(result['name']);
-      movie_dictionary[movie] = "URL To Be Encoded!!!!!";
-    return movie_dictionary;
+      quest_url = '/search?query=' + result['name'] + '&tag=movie'
+      movie_items.append({'title': result['name'], 'url': quest_url})
+    movies['items'] = movie_items
+    return movies
+
 
   ## API call to freebase to get list of similar people.
   def get_list_of_similar_people(self,query):
-    service_url = 'https://www.googleapis.com/freebase/v1/search';
+    actors = {'title': 'Similar Actor'}
+    service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
         'filter': '(all type:/people/person practitioner_of:actor)',
         'limit': 10,
         'key': Entity.freebase_key
         }
-    url = service_url + '?' + urllib.urlencode(params);
-    response = json.loads(urllib.urlopen(url).read());
-    people_dictionary = {};
+    url = service_url + '?' + urllib.urlencode(params)
+    response = json.loads(urllib.urlopen(url).read())
+
+    actor_items = []
     for result in response['result']:
-      person = str(result['name']);
-      people_dictionary[person] = "URL To Be Encoded!!!!!";
-    return people_dictionary;
+      quest_url = '/search?query=' + result['name'] + '&tag=actor'
+      actor_items.append({'title': result['name'], 'url': quest_url})
+    actors['items'] = actor_items
+    return actors
+
 
   ## Generating list of characters portrayed.
   def get_list_of_characters_portrayed(self,query):
-    service_url = 'https://www.googleapis.com/freebase/v1/search';
+    service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'filter': '(all portrayed_by:\"'+query+'\")',
         'limit': 15,
         'key': Entity.freebase_key
         }
-    url = service_url + '?' + urllib.urlencode(params);
-    response = json.loads(urllib.urlopen(url).read());
-    character_dictionary = {};
+
+    try:
+      url = service_url + '?' + urllib.urlencode(params)
+      response = json.loads(urllib.urlopen(url).read())
+    except Exception as e:
+      return None
+    character_dictionary = {}
     for result in response['result']:
-      character = str(result['name']);
-      character_dictionary[character] = "URL To Be Encoded!!!!!";
-    return character_dictionary;
+      character = str(result['name'])
+      character_dictionary[character] = "URL To Be Encoded!!!!!"
+    return character_dictionary
+
+
+if __name__ == '__main__':
+  actor = Actor()
+  import pprint
+  pp = pprint.PrettyPrinter(indent=2)
+  pp.pprint(actor.get_results('Aamir Khan'))
