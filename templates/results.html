@@ -44,7 +44,11 @@
             <div class="slider" style="text-align:center;">
               {% for item in list['items'] %}
               <div class="slide" style="border-right:1px solid #ccc;">
-                <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;height:65px;width:45px;vertical-align:middle;"/>
+                {% if item['image'] %}
+                <img src="{{ item['image'] }}" class="img-polaroid" style="margin:auto;max-width:145px;vertical-align:middle;"/>
+                {% else %}
+                <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;max-width:45px;vertical-align:middle;"/>
+                {% endif %}
                 <a href="{{ item['url'] }}">{{ item['title'] }}</a>
               </div>
               {% endfor %}

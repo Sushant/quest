@@ -136,8 +136,9 @@ class Artist(Entity):
     for a in artists:
       try:
         title = a.item.name
+        image = a.item.get_cover_image()
         quest_url = '/search/?query=' + title + '&tag=artist'
-        artist_items.append({'title': title, 'url': quest_url})
+        artist_items.append({'title': title, 'url': quest_url, 'image': image})
       except:
         continue
     similar_artists['items'] = artist_items
