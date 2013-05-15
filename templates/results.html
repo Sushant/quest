@@ -60,9 +60,9 @@
             <div class="row-fluid">
               <div class="span3">
                 {% if 'image' in results['infobox'] %}
-                <img src="{{ results['infobox']['image'] }}" class="img-polaroid">
+                <img src="{{ results['infobox']['image'] }}" class="img-polaroid" style="max-width:96px;">
                 {% else %}
-                <img src="/images/blank_image.jpg" class="img-polaroid">
+                <img src="/images/blank_image.jpg" class="img-polaroid" style="max-width:96px;">
                 {% endif %}
               </div>
               <div class="span9">
