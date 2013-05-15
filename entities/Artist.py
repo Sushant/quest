@@ -12,6 +12,7 @@ if not path in sys.path:
 del path
 
 from lib import params
+from lib import cache
 
 USERNAME = 'tnahsus'
 PASSWORD = 'sdb.xtc'
@@ -24,6 +25,8 @@ class Artist(Entity):
                     password_hash=pylast.md5(PASSWORD))
     config.ECHO_NEST_API_KEY = params.***REMOVED***
 
+
+  @cache.cache_results('artist')
   def get_results(self, query):
     results = {}
     try:
@@ -43,7 +46,7 @@ class Artist(Entity):
     artists = self.get_similar_artists(artist)
     if artists:
       results['lists'].append(artists)
-
+    print 'Results: ', results
     return results
 
 

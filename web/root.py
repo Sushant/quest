@@ -57,6 +57,7 @@ class Root:
         return {'result': response}
     return {'result': []}
 
+
   @cherrypy.expose
   def search(self, *args, **kwargs):
     query = kwargs.get('query', None)
