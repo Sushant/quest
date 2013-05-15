@@ -40,6 +40,9 @@ class Artist(Entity):
     tracks = self.get_top_tracks(artist)
     if tracks:
       results['lists'].append(tracks)
+    artists = self.get_similar_artists(artist)
+    if artists:
+      results['lists'].append(artists)
 
     return results
 
@@ -118,6 +121,28 @@ class Artist(Entity):
         continue
     top_tracks['items'] = track_items
     return top_tracks
+
+
+  def get_similar_artists(self, artist):
+    similar_artists = {'title': 'Similar Artists'}
+
+    try:
+      artists = artist.get_similar()
+      artists = artists[:10]
+    except Exception as e:
+      return None
+
+    artist_items = []
+    for a in artists:
+      try:
+        title = a.item.name
+        quest_url = '/search/?query=' + title + '&tag=artist'
+        artist_items.append({'title': title, 'url': quest_url})
+      except:
+        continue
+    similar_artists['items'] = artist_items
+    return similar_artists
+
 
 if __name__ == '__main__':
   a = Artist()
