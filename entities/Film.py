@@ -4,8 +4,8 @@ import imdb
 import json
 import urllib
 
-class Actor(Entity):
-  """ Entity representation for Entity called Actor. """
+class Film(Entity):
+  """ Entity representation for Entity called Film. """
 
   ## Overriding the get_results method of base class.
   def get_results(self,query):
@@ -15,11 +15,11 @@ class Actor(Entity):
     if infobox:
       results['infobox'] = infobox
     results['lists'] = []
-    movies = self.get_list_of_movies_from_freebase(query)
+    movies = self.get_list_of_similar_movies_from_freebase(query)
     if movies:
       results['lists'].append(movies)
 
-    actors = self.get_list_of_similar_people(query)
+    actors = self.get_list_of_actors(query)
     if actors:
       results['lists'].append(actors)
 
@@ -53,20 +53,34 @@ class Actor(Entity):
         if r.title and r.text:
           if r.title.lower() == 'Input interpretation'.lower():
             infobox['title'] = r.text
-          elif r.title.lower() == 'Basic information'.lower():
+          elif r.title.lower() == 'Basic movie information'.lower():
             lines = r.text.split('\n')
             basic_info = {}
             for line in lines:
               pair = line.split(' | ')
               basic_info[pair[0]] = pair[1]
             infobox['basic_info'] = basic_info
-          elif r.title.lower() == 'Notable facts'.lower():
+          elif r.title.lower() == 'Box office performance'.lower():
             lines = r.text.split('\n')
-            summary = []
+            box_office_info = {}
             for line in lines:
-              if line != '...':
-                summary.append(line)
-            infobox['summary'] = summary
+              pair = line.split(' | ')
+              box_office_info[pair[0]] = pair[1]
+            infobox['box_office_info'] = box_office_info  
+          elif r.title.lower() == 'Cast'.lower():
+            lines = r.text.split('\n')
+            cast_info = {}
+            for line in lines:
+              pair = line.split(' | ')
+              cast_info[pair[0]] = pair[1]
+            infobox['cast_info'] = cast_info
+          elif r.title.lower() == 'Academy Awards and nominations'.lower():
+            lines = r.text.split('\n')
+            awards_info = {}
+            for line in lines:
+              pair = line.split(' | ')
+              awards_info[pair[0]] = pair[1]
+            infobox['awards_info'] = awards_info
       except Exception as e:
         continue
     return infobox
@@ -85,8 +99,8 @@ class Actor(Entity):
 
 
   ## API call to freebase for list of movies. Response is quicker than IMDB API.
-  def get_list_of_movies_from_freebase(self, query):
-    movies = {'title': 'Movies'}
+  def get_list_of_similar_movies_from_freebase(self, query):
+    movies = {'title': 'Similar Movies'}
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
@@ -109,13 +123,13 @@ class Actor(Entity):
 
 
   ## API call to freebase to get list of similar people.
-  def get_list_of_similar_people(self,query):
-    actors = {'title': 'Similar Actor'}
+  def get_list_of_actors(self,query):
+    actors = {'title': 'Cast'}
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
-        'filter': '(all type:/people/person practitioner_of:actor)',
-        'limit': 10,
+        'filter': '(all type:/people/person notable:actor)',
+        'limit': 20,
         'key': Entity.freebase_key
         }
     url = service_url + '?' + urllib.urlencode(params)
@@ -129,29 +143,8 @@ class Actor(Entity):
     return actors
 
 
-  ## Generating list of characters portrayed.
-  def get_list_of_characters_portrayed(self,query):
-    service_url = 'https://www.googleapis.com/freebase/v1/search'
-    params = {
-        'filter': '(all portrayed_by:\"'+query+'\")',
-        'limit': 15,
-        'key': Entity.freebase_key
-        }
-
-    try:
-      url = service_url + '?' + urllib.urlencode(params)
-      response = json.loads(urllib.urlopen(url).read())
-    except Exception as e:
-      return None
-    character_dictionary = {}
-    for result in response['result']:
-      character = str(result['name'])
-      character_dictionary[character] = "URL To Be Encoded!!!!!"
-    return character_dictionary
-
-
 if __name__ == '__main__':
-  actor = Actor()
+  film = Film()
   import pprint
   pp = pprint.PrettyPrinter(indent=2)
-  pp.pprint(actor.get_results('Aamir Khan'))
+  pp.pprint(film.get_results('Lagaan'))

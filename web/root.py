@@ -67,6 +67,9 @@ class Root:
   def search(self, *args, **kwargs):
     query = kwargs.get('query', None)
     tag = kwargs.get('tag', None)
+    if tag == "Film Director":
+      tag = "Director"
+
     try:
       module = __import__(tag.capitalize())
       _class = getattr(module, tag.capitalize())

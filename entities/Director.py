@@ -4,8 +4,8 @@ import imdb
 import json
 import urllib
 
-class Actor(Entity):
-  """ Entity representation for Entity called Actor. """
+class Director(Entity):
+  """ Entity representation for Entity called Director. """
 
   ## Overriding the get_results method of base class.
   def get_results(self,query):
@@ -24,10 +24,6 @@ class Actor(Entity):
       results['lists'].append(actors)
 
     return results
-    #results['Similar Actors'] = self.get_list_of_similar_people(query)
-    #results['Characters Portrayed'] = self.get_list_of_characters_portrayed(query)
-    #return results
-
 
   # Return format:
   #'infobox': {
@@ -91,7 +87,7 @@ class Actor(Entity):
     params = {
         'query': query,
         'filter': '(all type:/film/film)',
-        'limit': 30,
+        'limit': 20,
         'key': Entity.freebase_key
         }
     try:
@@ -110,11 +106,11 @@ class Actor(Entity):
 
   ## API call to freebase to get list of similar people.
   def get_list_of_similar_people(self,query):
-    actors = {'title': 'Similar Actor'}
+    actors = {'title': 'Similar Directors'}
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
-        'filter': '(all type:/people/person practitioner_of:actor)',
+        'filter': '(all type:/people/person practitioner_of:director)',
         'limit': 10,
         'key': Entity.freebase_key
         }
@@ -123,35 +119,14 @@ class Actor(Entity):
 
     actor_items = []
     for result in response['result']:
-      quest_url = '/search?query=' + result['name'] + '&tag=actor'
+      quest_url = '/search?query=' + result['name'] + '&tag=director'
       actor_items.append({'title': result['name'], 'url': quest_url})
     actors['items'] = actor_items
     return actors
 
 
-  ## Generating list of characters portrayed.
-  def get_list_of_characters_portrayed(self,query):
-    service_url = 'https://www.googleapis.com/freebase/v1/search'
-    params = {
-        'filter': '(all portrayed_by:\"'+query+'\")',
-        'limit': 15,
-        'key': Entity.freebase_key
-        }
-
-    try:
-      url = service_url + '?' + urllib.urlencode(params)
-      response = json.loads(urllib.urlopen(url).read())
-    except Exception as e:
-      return None
-    character_dictionary = {}
-    for result in response['result']:
-      character = str(result['name'])
-      character_dictionary[character] = "URL To Be Encoded!!!!!"
-    return character_dictionary
-
-
 if __name__ == '__main__':
-  actor = Actor()
+  director = Director()
   import pprint
   pp = pprint.PrettyPrinter(indent=2)
-  pp.pprint(actor.get_results('Aamir Khan'))
+  pp.pprint(director.get_results('steven spielberg'))
