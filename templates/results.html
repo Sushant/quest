@@ -15,9 +15,9 @@
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
           </a>
           <a class="brand" href="/">Quest</a>
-          
+
           <div class="nav-collapse collapse">
-            
+
             <ul class="nav">
               <form method="post" action="/search" style="margin:0px;">
                 <div class="input-append" style="margin-top: 5px;">
@@ -38,25 +38,17 @@
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span7">
-          <h4>Movies</h4>
+          {% for list in results['lists'] %}
+          <h4>{{ list['title'] }}</h4>
           <div class="slider" style="text-align:center;">
-            {% for k, v in results['Movies'].iteritems() %}
+            {% for item in list['items'] %}
             <div class="slide" style="border-right:1px solid #ccc;">
               <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;height:65px;width:45px;vertical-align:middle;"/>
-              <a href="#">{{ k }}</a>
+              <a href="{{ item['url'] }}">{{ item['title'] }}</a>
             </div>
             {% endfor %}
           </div>
-          <h4>Similar Actors</h4>
-          <div class="slider" style="text-align:center;">
-            {% for k, v in results['Similar Actors'].iteritems() %}
-            <div class="slide" style="border-right:1px solid #ccc;">
-              <img src="/images/blank_image.jpg" class="img-polaroid" style="margin:auto;height:65px;width:45px;vertical-align:middle;"/>
-              <a href="#">{{ k }}</a>
-            </div>
-            {% endfor %}
-          </div>
-          
+          {% endfor %}
         </div>
 
         <!-- Info box -->
@@ -67,9 +59,9 @@
                 <img src="http://www.wolframcdn.com/waimage/hset028/d83/d837501c86161ada220e93cc7ee84d71_v001s.jpg?z=1&w=105&h=150" class="img-polaroid">
               </div>
               <div class="span9">
-                <dt>{{ query }}</dt>
+                <dt>{{ results['infobox']['title'] }}</dt>
                 <dl>
-                  {% for k,v in results['Facts']['Basic information'].iteritems() %}
+                  {% for k,v in results['infobox']['basic_info'].iteritems() %}
                   <dt>{{ k }}</dt>
                   <dd>{{ v }}</dd>
                   {% endfor %}
@@ -79,9 +71,9 @@
             <hr />
             <div class="row-fluid">
               <ul>
-                {% for fact in results['Facts']['Notable facts']%}
-                  {% if fact %}
-                <li>{{ fact }}</li>
+                {% for line in results['infobox']['summary']%}
+                  {% if line %}
+                <li>{{ line }}</li>
                    {% endif %}
                 {% endfor %}
               </ul>
