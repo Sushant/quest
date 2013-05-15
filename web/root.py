@@ -15,6 +15,7 @@ del path
 from lib import suggest
 from lib import params
 from lib import templates
+from lib import cache
 
 class Root:
 
@@ -45,23 +46,16 @@ class Root:
 
 
   @cherrypy.expose
+  @cache.cache_suggest
   def suggest(self, *args, **kwargs):
-    query = kwargs.get('query')
-    callback = kwargs.get('callback', None)
-    response = suggest.freebase(query)
-    if not response:
-      response = suggest.dbpedia(query)
-    if response:
-      response = {'result': response}
-      if callback:
-        return callback + '('+ json.dumps(response) + ')'
-      return json.dumps(response)
-    else:
-      response = {'result': []}
-      if callback:
-        return callback + '('+ json.dumps(response) + ')'
-      return json.dumps(response)
-
+    query = kwargs.get('query', None)
+    if query:
+      response = suggest.freebase(query)
+      if not response:
+        response = suggest.dbpedia(query)
+      if response:
+        return {'result': response}
+    return {'result': []}
 
   @cherrypy.expose
   def search(self, *args, **kwargs):
