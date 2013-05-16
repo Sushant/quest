@@ -68,6 +68,10 @@ class Root:
       tag = "Actor"
     elif tag == 'Musical Group' or tag == 'Guitarist' or tag == 'Musician':
       tag = 'Artist'
+    elif tag == 'Composition' or tag == 'Musical Recording':
+      tag = 'Track'
+    elif tag == 'Musical Album' or tag == 'Musical Release':
+      tag = 'Album'
     try:
       module = __import__(tag.capitalize())
       _class = getattr(module, tag.capitalize())
