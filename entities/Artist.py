@@ -104,7 +104,7 @@ class Artist(Entity):
       try:
         image = a.item.get_cover_image()
         title = a.item.title
-        quest_url = '/search/?query=' + title + '&tag=album'
+        quest_url = '/search/?query=' + artist.name + '|' + title + '&tag=album'
         album_items.append({'title': title, 'url': quest_url, 'image': image})
       except:
         continue
@@ -125,7 +125,7 @@ class Artist(Entity):
     for t in tracks:
       try:
         title = t.item.title
-        quest_url = '/search/?query=' + title + '&tag=track'
+        quest_url = '/search/?query=' + artist.name + '|' + title + '&tag=track'
         track_items.append({'title': title, 'url': quest_url})
       except:
         continue
