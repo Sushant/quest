@@ -11,8 +11,9 @@ if not path in sys.path:
     sys.path.insert(1, path)
 del path
 
-from lib import params
 from lib import cache
+from lib import params
+from lib import threadpool
 
 USERNAME = 'tnahsus'
 PASSWORD = 'sdb.xtc'
@@ -29,29 +30,34 @@ class Artist(Entity):
   @cache.cache_results('artist')
   def get_results(self, query):
     results = {}
+    infobox = {}
+    albums = {}
+    tracks = {}
+    artists = {}
     try:
       artist = self.lastfm.get_artist(query)
     except Exception as e:
       return None
-    infobox = self.get_facts(artist)
+
+    pool = threadpool.ThreadPool(4)
+    pool.add_task(self.get_facts, artist, infobox)
+    pool.add_task(self.get_top_albums, artist, albums)
+    pool.add_task(self.get_top_tracks, artist, tracks)
+    pool.add_task(self.get_similar_artists, artist, artists)
+    pool.wait_completion()
     if infobox:
       results['infobox'] = infobox
     results['lists'] = []
-    albums = self.get_top_albums(artist)
     if albums:
       results['lists'].append(albums)
-    tracks = self.get_top_tracks(artist)
     if tracks:
       results['lists'].append(tracks)
-    artists = self.get_similar_artists(artist)
     if artists:
       results['lists'].append(artists)
-    print 'Results: ', results
     return results
 
 
-  def get_facts(self, lf_artist):
-    infobox = {}
+  def get_facts(self, lf_artist, infobox):
     try:
       image = lf_artist.get_cover_image()
       name = lf_artist.name
@@ -83,8 +89,8 @@ class Artist(Entity):
     return infobox
 
 
-  def get_top_albums(self, artist):
-    top_albums = {'title': 'Top Albums'}
+  def get_top_albums(self, artist, top_albums):
+    top_albums['title'] = 'Top Albums'
 
     try:
       albums = artist.get_top_albums()
@@ -105,8 +111,8 @@ class Artist(Entity):
     return top_albums
 
 
-  def get_top_tracks(self, artist):
-    top_tracks = {'title': 'Top Tracks'}
+  def get_top_tracks(self, artist, top_tracks):
+    top_tracks['title'] = 'Top Tracks'
 
     try:
       tracks = artist.get_top_tracks()
@@ -126,8 +132,8 @@ class Artist(Entity):
     return top_tracks
 
 
-  def get_similar_artists(self, artist):
-    similar_artists = {'title': 'Similar Artists'}
+  def get_similar_artists(self, artist, similar_artists):
+    similar_artists['title'] = 'Similar Artists'
 
     try:
       artists = artist.get_similar()
@@ -152,4 +158,4 @@ if __name__ == '__main__':
   a = Artist()
   import pprint
   pp = pprint.PrettyPrinter(indent=2)
-  pp.pprint(a.get_results('Can'))
+  pp.pprint(a.get_results('Lionrock'))
