@@ -68,6 +68,8 @@ class Root:
       tag = "Actor"
     elif tag == 'Musical Group' or tag == 'Guitarist' or tag == 'Musician':
       tag = 'Artist'
+    elif not tag:
+      tag = 'Untaggedentity'
     try:
       module = __import__(tag.capitalize())
       _class = getattr(module, tag.capitalize())
