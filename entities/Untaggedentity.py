@@ -30,6 +30,8 @@ class Untaggedentity(Entity):
 		try:
 			results = client.query(query)
 			for result in results:
+				print result.title
+				print result.text
 				basic_info = {}
 				if result.title and result.text:
 					if result.title.lower() == "input interpretation" or result.title.lower() == "input":
@@ -37,7 +39,10 @@ class Untaggedentity(Entity):
 					elif result.title.lower() == "result":
 						basic_info['result'] = result.text
 						infobox['basic_info'] = basic_info
-					elif result.title.lower() == "basic information" or result.title.lower() == "typical human computation times":
+					elif result.title == "Decimal approximation":
+						basic_info['result'] = result.text
+						infobox['basic_info'] = basic_info
+					elif result.title == "Typical human computation times":
 						lines = result.text.split("|")
             					for line in lines:
               						pair = line.split(' : ')
