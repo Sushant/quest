@@ -64,7 +64,10 @@ class Root:
     tag = kwargs.get('tag', None)
     if tag == "Film Director":
       tag = "Director"
-
+    elif tag == "Film Actor":
+      tag = "Actor"
+    elif tag == 'Musical Group' or tag == 'Guitarist' or tag == 'Musician':
+      tag = 'Artist'
     try:
       module = __import__(tag.capitalize())
       _class = getattr(module, tag.capitalize())
