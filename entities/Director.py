@@ -150,7 +150,7 @@ class Director(Entity):
 
     director_items = []
     for result in response['result']:
-      self.extract(query, 'director')
+      self.extract(result['name'], 'director')
       image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=director'
       if image:

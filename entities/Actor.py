@@ -151,7 +151,7 @@ class Actor(Entity):
 
     actor_items = []
     for result in response['result']:
-      self.extract(query, 'actor')
+      self.extract(result['name'], 'actor')
       image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=actor'
       if image:

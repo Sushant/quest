@@ -123,7 +123,7 @@ class Film(Entity):
 
     movie_items = []
     for result in response['result']:
-      self.extract(query, 'film')
+      self.extract(result['name'], 'film')
       image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=film'
       if image:
