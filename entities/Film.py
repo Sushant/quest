@@ -19,6 +19,9 @@ from lib import threadpool
 class Film(Entity):
   """ Entity representation for Entity called Film. """
 
+  def __init__(self):
+    Entity.__init__(self)
+  
   ## Overriding the get_results method of base class.
   @cache.cache_results('film')
   def get_results(self,query):
@@ -120,6 +123,7 @@ class Film(Entity):
 
     movie_items = []
     for result in response['result']:
+      self.extract(query, 'film')
       image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=film'
       if image:

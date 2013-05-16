@@ -20,6 +20,9 @@ from lib import threadpool
 class Actor(Entity):
   """ Entity representation for Entity called Actor. """
 
+  def __init__(self):
+    Entity.__init__(self)
+
   ## Overriding the get_results method of base class.
   @cache.cache_results('actor')
   def get_results(self, query):
@@ -148,6 +151,7 @@ class Actor(Entity):
 
     actor_items = []
     for result in response['result']:
+      self.extract(query, 'actor')
       image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=actor'
       if image:

@@ -20,6 +20,9 @@ from lib import threadpool
 class Director(Entity):
   """ Entity representation for Entity called Director. """
 
+  def __init__(self):
+    Entity.__init__(self)
+
   ## Overriding the get_results method of base class.
   @cache.cache_results('director')
   def get_results(self,query):
@@ -147,6 +150,7 @@ class Director(Entity):
 
     director_items = []
     for result in response['result']:
+      self.extract(query, 'director')
       image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=director'
       if image:

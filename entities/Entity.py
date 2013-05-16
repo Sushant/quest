@@ -45,6 +45,7 @@ class Entity:
 
 
   def extract(self, query, tag):
+    #print "extract query:" + query + "tag: " + tag
     if self._queue:
       try:
         job = json.dumps({'query': query, 'tag': tag})
