@@ -3,11 +3,23 @@ import wolframalpha
 import imdb
 import json
 import urllib
+import os
+import sys
+CWD = os.path.dirname(__file__)
+
+path = os.path.abspath(os.path.join(CWD, '..'))
+if not path in sys.path:
+    sys.path.insert(1, path)
+del path
+
+from lib import params
+from lib import cache
 
 class Director(Entity):
   """ Entity representation for Entity called Director. """
 
   ## Overriding the get_results method of base class.
+  @cache.cache_results('director')
   def get_results(self,query):
     results = {}
 
@@ -47,6 +59,9 @@ class Director(Entity):
     for r in res:
       try:
         if r.title and r.text:
+          image = self.get_image(query)
+          if image:
+            infobox['image'] = image
           if r.title.lower() == 'Input interpretation'.lower():
             infobox['title'] = r.text
           elif r.title.lower() == 'Basic information'.lower():
@@ -98,8 +113,13 @@ class Director(Entity):
 
     movie_items = []
     for result in response['result']:
+      image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=film'
-      movie_items.append({'title': result['name'], 'url': quest_url})
+      movie_items.append({'title': result['name'], 'url': quest_url, 'image': image})
+      if image:
+        movie_items.append({'title': result['name'], 'url': quest_url, 'image': image})
+      else:
+        movie_items.append({'title': result['name'], 'url': quest_url})
     movies['items'] = movie_items
     return movies
 
@@ -114,13 +134,20 @@ class Director(Entity):
         'limit': 10,
         'key': Entity.freebase_key
         }
-    url = service_url + '?' + urllib.urlencode(params)
-    response = json.loads(urllib.urlopen(url).read())
+    try:
+      url = service_url + '?' + urllib.urlencode(params)
+      response = json.loads(urllib.urlopen(url).read())
+    except Exception as e:
+      return None
 
     actor_items = []
     for result in response['result']:
+      image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=director'
-      actor_items.append({'title': result['name'], 'url': quest_url})
+      if image:
+        actor_items.append({'title': result['name'], 'url': quest_url, 'image': image})
+      else:
+        actor_items.append({'title': result['name'], 'url': quest_url})
     actors['items'] = actor_items
     return actors
 
