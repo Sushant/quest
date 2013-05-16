@@ -64,7 +64,6 @@ def cache_results(tag):
           try:
             doc = {'_id': query.lower(), 'tag': tag, 'matches': response, 'ts': datetime.utcnow()}
             _db['results'].save(doc)
-            print 'Saved: ', doc
           except:
             pass
 
