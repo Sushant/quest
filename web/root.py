@@ -62,30 +62,34 @@ class Root:
   def search(self, *args, **kwargs):
     query = kwargs.get('query', None)
     tag = kwargs.get('tag', None)
-    if tag == "Film Director":
-      tag = "Director"
-    elif tag == "Film Actor":
-      tag = "Actor"
-    elif tag == 'Musical Group' or tag == 'Guitarist' or tag == 'Musician':
-      tag = 'Artist'
-    elif tag == 'Composition' or tag == 'Musical Recording':
-      tag = 'Track'
-    elif tag == 'Musical Album' or tag == 'Musical Release':
-      tag = 'Album'
-    elif not tag:
-      tag = 'Untaggedentity'
-    try:
-      module = __import__(tag.capitalize())
-      _class = getattr(module, tag.capitalize())
-      entity = _class()
-      results = entity.get_results(query)
-      results['query'] = query
-      results['tag'] = tag
-      template = templates.get('results.html')
-      return template.render({'results': results})
-    except Exception as e:
-      print 'Error: ', e
-      return None
+    if not query:
+      query = kwargs.get('searchTerm', None)
+    if query:
+      if tag == "Film Director":
+        tag = "Director"
+      elif tag == "Film Actor":
+        tag = "Actor"
+      elif tag == 'Musical Group' or tag == 'Guitarist' or tag == 'Musician':
+        tag = 'Artist'
+      elif tag == 'Composition' or tag == 'Musical Recording':
+        tag = 'Track'
+      elif tag == 'Musical Album' or tag == 'Musical Release':
+        tag = 'Album'
+      elif not tag:
+        tag = 'Untaggedentity'
+      try:
+        module = __import__(tag.capitalize())
+        _class = getattr(module, tag.capitalize())
+        entity = _class()
+        results = entity.get_results(query)
+        results['query'] = query
+        results['tag'] = tag
+        template = templates.get('results.html')
+        return template.render({'results': results})
+      except Exception as e:
+        print 'Error: ', e
+        return None
+      return 'Please specify a query'
 
 
 if __name__ == '__main__':
