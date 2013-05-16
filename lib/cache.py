@@ -1,6 +1,8 @@
 import json
 import pymongo
 
+from datetime import datetime
+
 
 def cache_suggest(func):
   def __cache(*args, **kwargs):
@@ -23,7 +25,7 @@ def cache_suggest(func):
       response = func(*args, **kwargs)
       if query and response != {'result': []}:
         try:
-          doc = {'_id': query.lower(), 'matches': response}
+          doc = {'_id': query.lower(), 'matches': response, 'ts': datetime.utcnow()}
           _db['suggest'].save(doc)
         except:
           pass
@@ -34,6 +36,9 @@ def cache_suggest(func):
   return __cache
 
 
+# Decorator for caching page results.
+# Needs to be called with tag in the first argument
+# e.g. @cache_results('artist')
 def cache_results(tag):
   def cache_wrapper(func):
     def __cache(*args):
@@ -57,7 +62,7 @@ def cache_results(tag):
         response = func(*args)
         if query and tag and response:
           try:
-            doc = {'_id': query.lower(), 'tag': tag, 'matches': response}
+            doc = {'_id': query.lower(), 'tag': tag, 'matches': response, 'ts': datetime.utcnow()}
             _db['results'].save(doc)
             print 'Saved: ', doc
           except:
