@@ -62,14 +62,14 @@
         <div class="span5">
           <div class="sidebar-nav" style="border:1px solid #ccc;box-shadow: 0 0 5px #ccc;padding:10px;">
             <div class="row-fluid">
-              <div class="span3">
+              <div class="span4">
                 {% if 'image' in results['infobox'] %}
-                <img src="{{ results['infobox']['image'] }}" class="img-polaroid" style="max-width:96px;">
+                <img src="{{ results['infobox']['image'] }}" class="img-polaroid" style="max-width:145px;">
                 {% else %}
-                <img src="/images/blank_image.jpg" class="img-polaroid" style="max-width:96px;">
+                <img src="/images/blank_image.jpg" class="img-polaroid" style="max-width:145px;">
                 {% endif %}
               </div>
-              <div class="span9">
+              <div class="span8">
                 {% if 'title' in results['infobox'] %}
                 <dt>{{ results['infobox']['title'] }}</dt>
                 {% endif %}

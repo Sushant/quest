@@ -20,6 +20,7 @@ PASSWORD = 'sdb.xtc'
 
 class Artist(Entity):
   def __init__(self):
+    Entity.__init__(self)
     self.lastfm = pylast.LastFMNetwork(api_key=params.***REMOVED***,
                     api_secret=params.***REMOVED***,
                     username=USERNAME,
@@ -147,6 +148,7 @@ class Artist(Entity):
         title = a.item.name
         image = a.item.get_cover_image()
         quest_url = '/search/?query=' + title + '&tag=artist'
+        self.extract(title, 'artist')
         artist_items.append({'title': title, 'url': quest_url, 'image': image})
       except:
         continue
@@ -158,4 +160,4 @@ if __name__ == '__main__':
   a = Artist()
   import pprint
   pp = pprint.PrettyPrinter(indent=2)
-  pp.pprint(a.get_results('Lionrock'))
+  pp.pprint(a.get_results('Sleeper'))
