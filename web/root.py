@@ -72,6 +72,8 @@ class Root:
       tag = 'Track'
     elif tag == 'Musical Album' or tag == 'Musical Release':
       tag = 'Album'
+    elif not tag:
+      tag = 'Untaggedentity'
     try:
       module = __import__(tag.capitalize())
       _class = getattr(module, tag.capitalize())

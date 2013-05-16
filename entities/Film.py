@@ -14,6 +14,7 @@ del path
 
 from lib import params
 from lib import cache
+from lib import threadpool
 
 class Film(Entity):
   """ Entity representation for Entity called Film. """
@@ -21,25 +22,26 @@ class Film(Entity):
   ## Overriding the get_results method of base class.
   @cache.cache_results('film')
   def get_results(self,query):
-    results = {}
 
-    infobox = self.get_facts(query)
+    results = {}
+    infobox = {}
+    movies = {}
+    actors = {}
+
+    pool = threadpool.ThreadPool(3)
+    pool.add_task(self.get_facts, query, infobox)
+    pool.add_task(self.get_list_of_similar_movies_from_freebase, query, movies)
+    pool.add_task(self.get_list_of_actors, query, actors)
+  
+    pool.wait_completion()
     if infobox:
       results['infobox'] = infobox
     results['lists'] = []
-    movies = self.get_list_of_similar_movies_from_freebase(query)
     if movies:
       results['lists'].append(movies)
-
-    actors = self.get_list_of_actors(query)
     if actors:
       results['lists'].append(actors)
-
     return results
-    #results['Similar Actors'] = self.get_list_of_similar_people(query)
-    #results['Characters Portrayed'] = self.get_list_of_characters_portrayed(query)
-    #return results
-
 
   # Return format:
   #'infobox': {
@@ -51,9 +53,8 @@ class Film(Entity):
   #       ],
   #       'summary': ['List of Strings']
   #  }
-  def get_facts(self,query):
+  def get_facts(self, query, infobox):
     client = wolframalpha.Client(Entity.wolframalpha_key)
-    infobox = {}
     try:
       res = client.query(query)
     except Exception as e:
@@ -101,21 +102,9 @@ class Film(Entity):
     return infobox
 
 
-  ## API call to IMDB for list of movies. Very slow.
-  def get_list_of_movies_from_IMDB(self,query):
-    ia = imdb.IMDb()
-    person = ia.search_person(query)
-    required_person = ia.get_person(person[0].personID)
-    titles = required_person.get_titlesRefs()
-    movie_dictionary = {}
-    for title in titles:
-      movie_dictionary[str(title)] = "To be encoded!!!!"
-    return movie_dictionary
-
-
   ## API call to freebase for list of movies. Response is quicker than IMDB API.
-  def get_list_of_similar_movies_from_freebase(self, query):
-    movies = {'title': 'Similar Movies'}
+  def get_list_of_similar_movies_from_freebase(self, query, movies):
+    movies['title'] = 'Similar Movies'
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
@@ -142,8 +131,8 @@ class Film(Entity):
 
 
   ## API call to freebase to get list of similar people.
-  def get_list_of_actors(self,query):
-    actors = {'title': 'Cast'}
+  def get_list_of_actors(self, query, actors):
+    actors['title'] = 'Cast'
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,

@@ -12,8 +12,9 @@ if not path in sys.path:
     sys.path.insert(1, path)
 del path
 
-from lib import params
 from lib import cache
+from lib import params
+from lib import threadpool
 
 
 class Actor(Entity):
@@ -21,23 +22,27 @@ class Actor(Entity):
 
   ## Overriding the get_results method of base class.
   @cache.cache_results('actor')
-  def get_results(self,query):
+  def get_results(self, query):
+    
     results = {}
+    infobox = {}
+    movies = {}
+    actors = {}
 
-    infobox = self.get_facts(query)
+    pool = threadpool.ThreadPool(3)
+    pool.add_task(self.get_facts, query, infobox)
+    pool.add_task(self.get_list_of_movies_from_freebase, query, movies)
+    pool.add_task(self.get_list_of_similar_people, query, actors)
+  
+    pool.wait_completion()
     if infobox:
       results['infobox'] = infobox
     results['lists'] = []
-    movies = self.get_list_of_movies_from_freebase(query)
     if movies:
       results['lists'].append(movies)
-
-    actors = self.get_list_of_similar_people(query)
     if actors:
       results['lists'].append(actors)
-
     return results
-
 
   # Return format:
   #'infobox': {
@@ -49,9 +54,8 @@ class Actor(Entity):
   #       ],
   #       'summary': ['List of Strings']
   #  }
-  def get_facts(self,query):
+  def get_facts(self, query, infobox):
     client = wolframalpha.Client(Entity.wolframalpha_key)
-    infobox = {}
     try:
       res = client.query(query)
     except Exception as e:
@@ -98,8 +102,8 @@ class Actor(Entity):
 
 
   ## API call to freebase for list of movies. Response is quicker than IMDB API.
-  def get_list_of_movies_from_freebase(self, query):
-    movies = {'title': 'Movies'}
+  def get_list_of_movies_from_freebase(self, query, movies):
+    movies['title'] = 'Movies'
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
@@ -126,8 +130,9 @@ class Actor(Entity):
 
 
   ## API call to freebase to get list of similar people.
-  def get_list_of_similar_people(self,query):
-    actors = {'title': 'Similar Actor'}
+  def get_list_of_similar_people(self, query, actors):
+
+    actors['title'] = 'Similar Actor'
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
@@ -154,7 +159,7 @@ class Actor(Entity):
 
 
   ## Generating list of characters portrayed.
-  def get_list_of_characters_portrayed(self,query):
+  def get_list_of_characters_portrayed(self, query):
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'filter': '(all portrayed_by:\"'+query+'\")',

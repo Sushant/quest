@@ -14,6 +14,8 @@ del path
 
 from lib import params
 from lib import cache
+from lib import threadpool
+
 
 class Director(Entity):
   """ Entity representation for Entity called Director. """
@@ -22,20 +24,25 @@ class Director(Entity):
   @cache.cache_results('director')
   def get_results(self,query):
     results = {}
+    infobox = {}
+    movies = {}
+    directors = {}
 
-    infobox = self.get_facts(query)
+    pool = threadpool.ThreadPool(3)
+    pool.add_task(self.get_facts, query, infobox)
+    pool.add_task(self.get_list_of_movies_from_freebase, query, movies)
+    pool.add_task(self.get_list_of_similar_people, query, directors)
+  
+    pool.wait_completion()
     if infobox:
       results['infobox'] = infobox
     results['lists'] = []
-    movies = self.get_list_of_movies_from_freebase(query)
     if movies:
       results['lists'].append(movies)
-
-    actors = self.get_list_of_similar_people(query)
-    if actors:
-      results['lists'].append(actors)
-
+    if directors:
+      results['lists'].append(directors)
     return results
+
 
   # Return format:
   #'infobox': {
@@ -47,15 +54,13 @@ class Director(Entity):
   #       ],
   #       'summary': ['List of Strings']
   #  }
-  def get_facts(self,query):
+  def get_facts(self, query, infobox):
     client = wolframalpha.Client(Entity.wolframalpha_key)
-    infobox = {}
     try:
       res = client.query(query)
     except Exception as e:
       print 'Failed to get facts from Wolfram|Alpha', str(e)
       return infobox
-
     for r in res:
       try:
         if r.title and r.text:
@@ -84,7 +89,7 @@ class Director(Entity):
 
 
   ## API call to IMDB for list of movies. Very slow.
-  def get_list_of_movies_from_IMDB(self,query):
+  def get_list_of_movies_from_IMDB(self, query):
     ia = imdb.IMDb()
     person = ia.search_person(query)
     required_person = ia.get_person(person[0].personID)
@@ -96,8 +101,8 @@ class Director(Entity):
 
 
   ## API call to freebase for list of movies. Response is quicker than IMDB API.
-  def get_list_of_movies_from_freebase(self, query):
-    movies = {'title': 'Movies'}
+  def get_list_of_movies_from_freebase(self, query, movies):
+    movies['title'] = 'Movies'
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
@@ -125,8 +130,8 @@ class Director(Entity):
 
 
   ## API call to freebase to get list of similar people.
-  def get_list_of_similar_people(self,query):
-    actors = {'title': 'Similar Directors'}
+  def get_list_of_similar_people(self, query, directors):
+    directors['title'] = 'Similar Directors'
     service_url = 'https://www.googleapis.com/freebase/v1/search'
     params = {
         'query': query,
@@ -140,16 +145,16 @@ class Director(Entity):
     except Exception as e:
       return None
 
-    actor_items = []
+    director_items = []
     for result in response['result']:
       image = self.get_image(result['name'])
       quest_url = '/search?query=' + result['name'] + '&tag=director'
       if image:
-        actor_items.append({'title': result['name'], 'url': quest_url, 'image': image})
+        director_items.append({'title': result['name'], 'url': quest_url, 'image': image})
       else:
-        actor_items.append({'title': result['name'], 'url': quest_url})
-    actors['items'] = actor_items
-    return actors
+        director_items.append({'title': result['name'], 'url': quest_url})
+    directors['items'] = director_items
+    return directors
 
 
 if __name__ == '__main__':
