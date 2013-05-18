@@ -1,7 +1,28 @@
-quest
+Quest
 =====
 
 Knowledge Search Engine
+
+Steps for installing the required software/libraries:
+1) Install the latest version of MongoDB from http://www.mongodb.org/downloads
+2) Install Beanstalkd from http://kr.github.io/beanstalkd/download.html
+3) Start MongoDB by setting up the required database paths.
+4) Start Beanstalk daemon.
+5) Install Pip for installing Python packages.
+6) Install all the required Python libraries by running the following (point to the downloaded requirements.txt):
+$ pip install -U -r requirements.txt
+
+
+Running the search engine:
+1) Go to the web folder and run
+$ python root.py
+2) Point the browser to http://localhost:8080/
+3) In the search text box, type a query and choose one of the suggestions and click the magnifying glass button.
+
+Running the extractor:
+1) Go to the lib folder and run
+$ python extractor.py
+
 
 ## License
 
