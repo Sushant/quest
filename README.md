@@ -34,6 +34,10 @@ $ python root.py
 $ python extractor.py
 
 
+## Contributors
+- Sushant Bhadkamkar
+- Prasad Kapde
+- Ashwath Pratap Singh
 
 ## License
 
