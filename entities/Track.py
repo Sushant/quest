@@ -21,8 +21,8 @@ PASSWORD = 'sdb.xtc'
 class Track(Entity):
   def __init__(self):
     Entity.__init__(self)
-    self.lastfm = pylast.LastFMNetwork(api_key=params.***REMOVED***,
-                    api_secret=params.***REMOVED***,
+    self.lastfm = pylast.LastFMNetwork(api_key=params.LASTFM_API_KEY,
+                    api_secret=params.LASTFM_API_SECRET,
                     username=USERNAME,
                     password_hash=pylast.md5(PASSWORD))
 

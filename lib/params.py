@@ -9,6 +9,6 @@ ENTITIES_DIR = os.path.join(BASE, 'entities')
 WEB_PORT = 8080
 FREEBASE_SUGGEST_URL = 'https://www.googleapis.com/freebase/v1/search?query='
 DBPEDIA_SUGGEST_URL = 'http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?QueryString='
-***REMOVED*** = '***REMOVED***'
-***REMOVED*** = '***REMOVED***'
-***REMOVED*** = '***REMOVED***'
+LASTFM_API_KEY = '<LASTFM_API_KEY>'
+LASTFM_API_SECRET = '<LASTFM_API_SECRET>'
+ECHONEST_API_KEY = '<ECHONEST_API_KEY>'

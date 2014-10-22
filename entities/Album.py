@@ -21,11 +21,11 @@ PASSWORD = 'sdb.xtc'
 class Album(Entity):
   def __init__(self):
     Entity.__init__(self)
-    self.lastfm = pylast.LastFMNetwork(api_key=params.***REMOVED***,
-                    api_secret=params.***REMOVED***,
+    self.lastfm = pylast.LastFMNetwork(api_key=params.LASTFM_API_KEY,
+                    api_secret=params.LASTFM_API_SECRET,
                     username=USERNAME,
                     password_hash=pylast.md5(PASSWORD))
-    config.ECHO_NEST_API_KEY = params.***REMOVED***
+    config.ECHO_NEST_API_KEY = params.ECHONEST_API_KEY
 
 
   @cache.cache_results('album')
