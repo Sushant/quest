@@ -69,7 +69,7 @@ class Root:
         tag = "Director"
       elif tag == "Film Actor":
         tag = "Actor"
-      elif tag == 'Musical Group' or tag == 'Guitarist' or tag == 'Musician':
+      elif tag in ['Musical Group', 'Guitarist', 'Musician', 'Film score Artist', 'Alternative Artist']:
         tag = 'Artist'
       elif tag == 'Composition' or tag == 'Musical Recording':
         tag = 'Track'

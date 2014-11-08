@@ -1,6 +1,5 @@
 from Entity import Entity
 import wolframalpha
-import imdb
 import json
 import urllib
 import os
@@ -26,7 +25,7 @@ class Actor(Entity):
   ## Overriding the get_results method of base class.
   @cache.cache_results('actor')
   def get_results(self, query):
-    
+
     results = {}
     infobox = {}
     movies = {}
@@ -36,7 +35,7 @@ class Actor(Entity):
     pool.add_task(self.get_facts, query, infobox)
     pool.add_task(self.get_list_of_movies_from_freebase, query, movies)
     pool.add_task(self.get_list_of_similar_people, query, actors)
-  
+
     pool.wait_completion()
     if infobox:
       results['infobox'] = infobox

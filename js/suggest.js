@@ -2,7 +2,7 @@
       $( "#searchText" ).autocomplete({
         source: function( request, response ) {
           $.ajax({
-            url: "http://localhost:8080/suggest",
+            url: "/suggest",
             dataType: "jsonp",
             data: {
               query: request.term
