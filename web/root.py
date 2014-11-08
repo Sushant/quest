@@ -50,7 +50,9 @@ class Root:
   def suggest(self, *args, **kwargs):
     query = kwargs.get('query', None)
     if query:
-      response = suggest.freebase(query)
+      response = suggest.local_db(query)
+      if not response:
+        response = suggest.freebase(query)
       if not response:
         response = suggest.dbpedia(query)
       if response:

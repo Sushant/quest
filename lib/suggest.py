@@ -1,9 +1,31 @@
 import json
 import urllib
+import pymongo
 import requests
 import traceback
 
 from lib import params
+
+def local_db(query):
+  try:
+    _conn = pymongo.MongoClient()
+    _db = _conn['quest']
+  except:
+    pass
+
+  try:
+    resp = []
+    if query and _db:
+      response = _db['results'].find({'_id': {'$regex': query.lower()}})
+      for r in response:
+        resp.append({
+          'name': r['matches']['infobox']['title'],
+          'tag': r['tag'].capitalize(),
+          'score': 0
+        })
+      return resp
+  except:
+    pass
 
 def freebase(query):
   url = params.FREEBASE_SUGGEST_URL + urllib.quote(query)
