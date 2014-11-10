@@ -1,6 +1,5 @@
 from Entity import Entity
 import wolframalpha
-import imdb
 import json
 import urllib
 import os
