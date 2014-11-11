@@ -17,54 +17,42 @@ import wolframalpha
 
 class Untaggedentity(Entity):
 
-	@cache.cache_results('untaggedentity')
-	def get_results(self, query):
-		info = self.get_facts(query)
-		results ={}
-		results['infobox'] = info
-		return results
+    @cache.cache_results('untaggedentity')
+    def get_results(self, query):
+        info = self.get_facts(query)
+        results ={}
+        results['infobox'] = info
+        return results
 
-	def get_facts(self,query):
-		client = wolframalpha.Client(Entity.wolframalpha_key)
-		infobox = {}
-		try:
-			results = client.query(query)
-			for result in results:
-				print result.title
-				print result.text
-				basic_info = {}
-				if result.title and result.text:
-					if result.title.lower() == "input interpretation" or result.title.lower() == "input":
-						infobox['title'] = result.text
-					elif result.title.lower() == "result":
-						basic_info['result'] = result.text
-						infobox['basic_info'] = basic_info
-					elif result.title == "Decimal approximation":
-						basic_info['result'] = result.text
-						infobox['basic_info'] = basic_info
-					elif result.title == "Typical human computation times":
-						lines = result.text.split("|")
-            					for line in lines:
-              						pair = line.split(' : ')
-              						basic_info[pair[0]] = pair[1]
-            					infobox['basic_info'] = basic_info
-            				elif result.title.lower() == "notable facts":
-            					lines = result.text.split('\n')
-            					summary = []
-            					for line in lines:
-            						if line != "...":
-            							summary.append(line)
-            					infobox['summary'] = summary
-       		except Exception as e:
-        			print "Failed to fetch data from wolfram|alpha";
-        	return infobox
-
-
-
-
-
-
-
-    
-			
-    	
+    def get_facts(self,query):
+        client = wolframalpha.Client(Entity.wolframalpha_key)
+        infobox = {}
+        try:
+            results = client.query(query)
+            for result in results:
+                basic_info = {}
+                if result.title and result.text:
+                    if result.title.lower() == "input interpretation" or result.title.lower() == "input":
+                        infobox['title'] = result.text
+                    elif result.title.lower() == "result":
+                        basic_info['result'] = result.text
+                        infobox['basic_info'] = basic_info
+                    elif result.title == "Decimal approximation":
+                        basic_info['result'] = result.text
+                        infobox['basic_info'] = basic_info
+                    elif result.title == "Typical human computation times":
+                        lines = result.text.split("|")
+                        for line in lines:
+                            pair = line.split(' : ')
+                            basic_info[pair[0]] = pair[1]
+                        infobox['basic_info'] = basic_info
+                    elif result.title.lower() == "notable facts":
+                        lines = result.text.split('\n')
+                        summary = []
+                        for line in lines:
+                            if line != "...":
+                                summary.append(line)
+                        infobox['summary'] = summary
+        except Exception as e:
+            print "Failed to fetch data from wolfram|alpha";
+        return infobox

@@ -27,6 +27,25 @@ def local_db(query):
   except:
     pass
 
+def find_entity_locally(query):
+  try:
+    _conn = pymongo.MongoClient()
+    _db = _conn['quest']
+  except:
+    pass
+
+  try:
+    if query and _db:
+      response = _db['results'].find_one({'_id': query.lower()})
+      return {
+        'name': response['matches']['infobox']['title'],
+        'tag': response['tag'].capitalize(),
+        'score': 0
+      }
+  except:
+    return None
+
+
 def freebase(query):
   url = params.FREEBASE_SUGGEST_URL + urllib.quote(query)
   try:

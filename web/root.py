@@ -25,19 +25,6 @@ class Root:
 
   def load_entities(self):
     sys.path.insert(1, params.ENTITIES_DIR)
-    #library_list = []
-    #print 'Loading entities...'
-
-    #for f in os.listdir(params.ENTITIES_DIR):
-    #  module_name, ext = os.path.splitext(f) # Handles no-extension files, etc.
-    #  print module_name, ext
-    #  if ext == '.py': # Important, ignore .pyc/other files.
-    #    if module_name != '__init__':
-    #      print 'imported module: %s' % (module_name)
-    #      module = __import__(module_name)
-    #      library_list.append(module)
-
-    #return library_list
 
   @cherrypy.expose
   def index(self):
@@ -63,22 +50,25 @@ class Root:
   @cherrypy.expose
   def search(self, *args, **kwargs):
     query = kwargs.get('query', None)
-    tag = kwargs.get('tag', None)
+    tag = kwargs.get('tag', None).lower()
     if not query:
       query = kwargs.get('searchTerm', None)
     if query:
-      if tag == "Film Director":
-        tag = "Director"
-      elif tag == "Film Actor":
-        tag = "Actor"
-      elif tag in ['Musical Group', 'Guitarist', 'Musician', 'Film score Artist', 'Alternative Artist']:
+      if tag == "film director":
+        tag = "director"
+      elif tag == "film actor":
+        tag = "actor"
+      elif tag in ['musical group', 'guitarist', 'musician', 'film score artist', 'alternative artist']:
         tag = 'Artist'
-      elif tag == 'Composition' or tag == 'Musical Recording':
+      elif tag in ['composition', 'cusical Recording']:
         tag = 'Track'
-      elif tag == 'Musical Album' or tag == 'Musical Release':
+      elif tag in ['musical album', 'musical release']:
         tag = 'Album'
       elif not tag:
-        tag = 'Untaggedentity'
+        try:
+          tag = suggest.find_entity_locally(query)['tag']
+        except:
+          tag = 'Untaggedentity'
       try:
         module = __import__(tag.capitalize())
         _class = getattr(module, tag.capitalize())
