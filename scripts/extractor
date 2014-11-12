@@ -10,7 +10,7 @@ case $2 in
       cd ${ENV_DIR}
       source bin/activate
       cd ${PROJECT_DIR}
-      python extractor.py ${1} &
+      python lib/extractor.py ${1} &
       cd "../.."
       echo $! > ${RUN_DIR}"/"${PID_FILE};
       ;;
