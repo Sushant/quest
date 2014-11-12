@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ENV_DIR="../.."
+PROJECT_DIR="quest"
+RUN_DIR="run"
+
+NUM_EXTRACTORS=3
+
+mkdir -p ${ENV_DIR}"/"${RUN_DIR}

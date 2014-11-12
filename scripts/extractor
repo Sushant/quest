@@ -1,0 +1,23 @@
+#!/bin/bash
+
+BASEDIR=$(dirname $0)
+cd ${BASEDIR}
+source script_vars
+PID_FILE="extractor-${1}.pid"
+
+case $2 in
+   start)
+      cd ${ENV_DIR}
+      source bin/activate
+      cd ${PROJECT_DIR}
+      python extractor.py ${1} &
+      cd "../.."
+      echo $! > ${RUN_DIR}"/"${PID_FILE};
+      ;;
+    stop)
+      cd ${ENV_DIR}
+      kill `cat ${RUN_DIR}"/"${PID_FILE}` ;;
+    *)
+      echo "usage: extractor <extractor_id> {start|stop}" ;;
+esac
+exit 0
