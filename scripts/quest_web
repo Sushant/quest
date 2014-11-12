@@ -10,7 +10,7 @@ case $1 in
       cd ${ENV_DIR}
       source bin/activate
       cd ${PROJECT_DIR}
-      python web/root.py &
+      python web/root.py > ../logs/web.log &
       cd "../.."
       echo $! > ${RUN_DIR}"/"${PID_FILE};
       ;;
@@ -18,6 +18,6 @@ case $1 in
       cd ${ENV_DIR}
       kill `cat ${RUN_DIR}"/"${PID_FILE}` ;;
     *)
-      echo "usage: web {start|stop}" ;;
+      echo "usage: quest_web {start|stop}" ;;
 esac
 exit 0
