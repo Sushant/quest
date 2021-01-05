@@ -15,8 +15,8 @@ from lib import cache
 from lib import params
 from lib import threadpool
 
-USERNAME = 'tnahsus'
-PASSWORD = 'sdb.xtc'
+USERNAME = 'USERNAME'
+PASSWORD = 'PASSWORD'
 
 class Track(Entity):
   def __init__(self):
