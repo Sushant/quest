@@ -1,5 +1,5 @@
 CherryPy==3.2.4
-Jinja2==2.6
+Jinja2==2.11.3
 PyYAML==3.10
 beanstalkc==0.3.0
 pyechonest==7.2.1
