@@ -4,7 +4,7 @@ PyYAML==3.10
 beanstalkc==0.3.0
 pyechonest==7.2.1
 pylast==0.5.11
-pymongo==2.5.1
+pymongo==2.5.2
 requests==1.2.0
 wolframalpha==1.0.2
 wsgiref==0.1.2
